@@ -1,11 +1,16 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// ═══════════════════════════════════════════════════════
+//  js/firebase.js  —  Inicialización de Firebase (Web SDK v10, CDN)
+//
+//  Exporta: app, auth, db, storage
+//  Usados por: auth.js, db.js, storage.js
+// ═══════════════════════════════════════════════════════
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+// Configuración del proyecto Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDM8ZHaYI7UAbOhF8xK7H853EWwMbem_O8",
   authDomain: "saiteck-bazar.firebaseapp.com",
@@ -16,6 +21,12 @@ const firebaseConfig = {
   measurementId: "G-B484L070KT"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Inicializar Firebase
+export const app     = initializeApp(firebaseConfig);
+export const auth    = getAuth(app);
+export const db      = getFirestore(app);
+export const storage = getStorage(app);
+
+// Nota: getAnalytics() se omite porque requiere medición/cookies que
+// pueden ser bloqueadas por "Tracking Prevention" del navegador y no
+// es necesario para el funcionamiento del panel de administración.
