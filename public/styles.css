@@ -123,6 +123,18 @@ body {
 .auth-switch a { color:var(--pink-500); text-decoration:none; font-weight:600; }
 .auth-switch a:hover { text-decoration:underline; }
 
+.auth-back-link {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:.78rem;
+  color:var(--gray-400);
+  text-decoration:none;
+  margin-bottom:16px;
+  transition:color var(--transition);
+}
+.auth-back-link:hover { color:var(--pink-500); }
+
 /* ══════════════════════════════════════════════════════
    ADMIN SHELL
 ══════════════════════════════════════════════════════ */
@@ -383,6 +395,7 @@ body {
   transition:all var(--transition);
   white-space:nowrap;
   box-shadow:0 4px 14px rgba(236,72,153,.3);
+  text-decoration:none;
 }
 .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(236,72,153,.4); }
 .btn-primary:disabled { opacity:.6; cursor:not-allowed; transform:none; }

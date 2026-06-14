@@ -3,545 +3,115 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Bazar Admin ✦</title>
+  <title>Mi Bazar ✦ Encuentra tu bazar favorito</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="landing.css" />
 </head>
 <body>
 
 <!-- ══════════════════════════════════════════
-     AUTH SCREEN
+     HEADER
 ══════════════════════════════════════════ -->
-<div id="authScreen" class="auth-screen">
-  <div class="auth-card">
-    <div class="auth-logo">Mi <span>Bazar</span> ✦</div>
-    <p class="auth-subtitle">Panel de Administrador</p>
-    <div id="authError" class="auth-error hidden"></div>
-
-    <!-- Login -->
-    <div id="loginForm">
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="loginEmail" placeholder="tu@correo.com" />
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="loginPassword" placeholder="••••••••" />
-      </div>
-      <button class="btn-primary w-full" id="loginBtn" onclick="authLogin()">
-        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-      </button>
-      <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="toggleAuthMode('register')">Regístrate</a></p>
-      <p class="auth-switch"><a href="#" onclick="toggleAuthMode('reset')">Olvidé mi contraseña</a></p>
-    </div>
-
-    <!-- Register -->
-    <div id="registerForm" class="hidden">
-      <div class="form-group">
-        <label>Nombre de tu bazar</label>
-        <input type="text" id="regBazarName" placeholder="Ej. Bazar Lupita" />
-      </div>
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="regEmail" placeholder="tu@correo.com" />
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="regPassword" placeholder="Mín. 6 caracteres" />
-      </div>
-      <button class="btn-primary w-full" onclick="authRegister()">
-        <i class="fas fa-user-plus"></i> Crear cuenta
-      </button>
-      <p class="auth-switch">¿Ya tienes cuenta? <a href="#" onclick="toggleAuthMode('login')">Inicia sesión</a></p>
-    </div>
-
-    <!-- Reset -->
-    <div id="resetForm" class="hidden">
-      <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:16px;">Te enviaremos un correo para restablecer tu contraseña.</p>
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="resetEmail" placeholder="tu@correo.com" />
-      </div>
-      <button class="btn-primary w-full" onclick="authReset()">
-        <i class="fas fa-paper-plane"></i> Enviar correo
-      </button>
-      <p class="auth-switch"><a href="#" onclick="toggleAuthMode('login')">← Volver</a></p>
-    </div>
+<header class="landing-header">
+  <div class="landing-header-inner">
+    <div class="landing-logo">Mi <span>Bazar</span> ✦</div>
+    <a href="/admin" class="admin-btn">
+      <i class="fas fa-user-shield"></i> Admin
+    </a>
   </div>
-</div>
+</header>
 
 <!-- ══════════════════════════════════════════
-     ADMIN SHELL
+     HERO
 ══════════════════════════════════════════ -->
-<div id="adminShell" class="hidden">
+<section class="landing-hero">
+  <div class="landing-hero-inner">
+    <h1 class="landing-title">
+      Descubre <em>bazares</em> increíbles<br/>cerca de ti
+    </h1>
+    <p class="landing-subtitle">
+      Encuentra tiendas, productos y promociones de comerciantes locales. Todo en un solo lugar.
+    </p>
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-logo">Mi <span>Bazar</span> ✦</div>
-      <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+    <!-- Search -->
+    <div class="landing-search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="globalBusinessSearch" placeholder="Busca por nombre de bazar o categoría… (ej. ropa, joyería, Bazar Lupita)"
+             oninput="handleBusinessSearch(this.value)" />
     </div>
-    <div class="sidebar-user" id="sidebarUser">
-      <div class="user-avatar" id="userAvatar">?</div>
-      <div class="user-info">
-        <div class="user-bazar" id="userBazarName">Mi Bazar</div>
-        <div class="user-email" id="userEmail"></div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <button class="nav-item active" data-section="inicio" onclick="goTo('inicio')">
-        <i class="fas fa-home"></i><span>Inicio</span>
-      </button>
-      <button class="nav-item" data-section="catalogo" onclick="goTo('catalogo')">
-        <i class="fas fa-store"></i><span>Catálogo</span>
-      </button>
-      <button class="nav-item" data-section="referencias" onclick="goTo('referencias')">
-        <i class="fas fa-star"></i><span>Referencias</span>
-      </button>
-      <button class="nav-item" data-section="contacto" onclick="goTo('contacto')">
-        <i class="fas fa-address-book"></i><span>Contacto</span>
-      </button>
-    </nav>
-    <div class="sidebar-footer">
-      <a class="sidebar-preview-btn" id="previewLink" href="#" target="_blank">
-        <i class="fas fa-external-link-alt"></i> Ver mi tienda
-      </a>
-      <button class="sidebar-logout" onclick="authLogout()">
-        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-      </button>
-    </div>
-  </aside>
 
-  <!-- Topbar (mobile) -->
-  <div class="topbar">
-    <button class="topbar-menu" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-    <div class="topbar-title" id="topbarTitle">Inicio</div>
-    <div class="topbar-actions" id="topbarActions"></div>
+    <!-- Category chips -->
+    <div class="landing-chips" id="categoryChips"></div>
   </div>
-
-  <!-- Overlay for mobile sidebar -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-  <!-- Main content -->
-  <main class="main-content">
-
-    <!-- ── INICIO ── -->
-    <section id="sec-inicio" class="admin-section active">
-      <div class="section-header">
-        <div>
-          <h1 class="section-title">Configuración de Inicio</h1>
-          <p class="section-sub">Personaliza cómo luce la portada de tu tienda</p>
-        </div>
-        <button class="btn-primary" onclick="saveInicio()">
-          <i class="fas fa-save"></i> Guardar cambios
-        </button>
-      </div>
-
-      <div class="cards-grid">
-        <!-- Logo & nombre -->
-        <div class="admin-card col-2">
-          <div class="card-head"><i class="fas fa-store"></i> Identidad de tu bazar</div>
-          <div class="cards-grid inner">
-            <div class="form-group">
-              <label>Nombre del bazar</label>
-              <input type="text" id="iBazarName" placeholder="Ej. Bazar Lupita" />
-            </div>
-            <div class="form-group">
-              <label>Slogan / frase corta</label>
-              <input type="text" id="iSlogan" placeholder="Ej. Tu tienda favorita en línea" />
-            </div>
-            <div class="form-group col-2">
-              <label>Mensaje de bienvenida</label>
-              <textarea id="iWelcome" rows="3" placeholder="Cuéntales a tus clientes quién eres…"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Logo upload -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fas fa-image"></i> Logo</div>
-          <div class="logo-upload-zone" id="logoDropZone" onclick="document.getElementById('logoFile').click()">
-            <img id="logoPreview" src="" alt="Logo" class="hidden" />
-            <div id="logoPlaceholder">
-              <i class="fas fa-cloud-upload-alt"></i>
-              <p>Clic para subir logo</p>
-              <span>PNG, JPG · Recomendado 400×400px</span>
-            </div>
-            <input type="file" id="logoFile" accept="image/*" class="hidden" onchange="handleLogoUpload(event)" />
-          </div>
-          <button class="btn-ghost mt-10" onclick="removeLogo()" id="removeLogoBtn" style="display:none">
-            <i class="fas fa-trash"></i> Quitar logo
-          </button>
-        </div>
-
-        <!-- Hero banner -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fas fa-panorama"></i> Banner de portada</div>
-          <div class="logo-upload-zone" id="bannerDropZone" onclick="document.getElementById('bannerFile').click()">
-            <img id="bannerPreview" src="" alt="Banner" class="hidden" style="object-fit:cover;aspect-ratio:2/1;" />
-            <div id="bannerPlaceholder">
-              <i class="fas fa-image"></i>
-              <p>Clic para subir banner</p>
-              <span>PNG, JPG · 1200×600px recomendado</span>
-            </div>
-            <input type="file" id="bannerFile" accept="image/*" class="hidden" onchange="handleBannerUpload(event)" />
-          </div>
-        </div>
-
-        <!-- Featured products -->
-        <div class="admin-card col-2">
-          <div class="card-head"><i class="fas fa-star"></i> Productos destacados en portada</div>
-          <p class="card-note">Elige hasta 6 productos para mostrar en la sección de inicio de tu tienda.</p>
-          <div id="featuredPickerGrid" class="featured-picker-grid">
-            <div class="empty-state-sm"><i class="fas fa-box-open"></i> Carga productos en Catálogo primero</div>
-          </div>
-        </div>
-
-        <!-- Theme color -->
-        <div class="admin-card col-2">
-          <div class="card-head"><i class="fas fa-palette"></i> Color principal de la tienda</div>
-          <div class="color-picker-row">
-            <div class="preset-colors" id="presetColors">
-              <div class="preset-swatch active" data-color="#EC4899" style="background:#EC4899" onclick="selectThemeColor('#EC4899',this)" title="Rosa"></div>
-              <div class="preset-swatch" data-color="#8B5CF6" style="background:#8B5CF6" onclick="selectThemeColor('#8B5CF6',this)" title="Lavanda"></div>
-              <div class="preset-swatch" data-color="#F59E0B" style="background:#F59E0B" onclick="selectThemeColor('#F59E0B',this)" title="Ámbar"></div>
-              <div class="preset-swatch" data-color="#10B981" style="background:#10B981" onclick="selectThemeColor('#10B981',this)" title="Esmeralda"></div>
-              <div class="preset-swatch" data-color="#3B82F6" style="background:#3B82F6" onclick="selectThemeColor('#3B82F6',this)" title="Azul"></div>
-              <div class="preset-swatch" data-color="#EF4444" style="background:#EF4444" onclick="selectThemeColor('#EF4444',this)" title="Rojo"></div>
-              <div class="preset-swatch" data-color="#F97316" style="background:#F97316" onclick="selectThemeColor('#F97316',this)" title="Naranja"></div>
-              <div class="preset-swatch" data-color="#06B6D4" style="background:#06B6D4" onclick="selectThemeColor('#06B6D4',this)" title="Cian"></div>
-            </div>
-            <div class="custom-color">
-              <label>Color personalizado</label>
-              <input type="color" id="customColor" value="#EC4899" oninput="selectThemeColor(this.value, null)" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── CATÁLOGO ── -->
-    <section id="sec-catalogo" class="admin-section">
-      <!-- Sub-tabs -->
-      <div class="section-header">
-        <div>
-          <h1 class="section-title">Catálogo</h1>
-          <p class="section-sub">Gestiona productos y categorías de tu tienda</p>
-        </div>
-        <div class="header-btns">
-          <button class="btn-ghost" onclick="openCatModal()"><i class="fas fa-tag"></i> Categorías</button>
-          <button class="btn-primary" onclick="openProductModal()"><i class="fas fa-plus"></i> Nuevo producto</button>
-        </div>
-      </div>
-
-      <!-- Search + filter bar -->
-      <div class="catalog-toolbar">
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" id="catalogSearch" placeholder="Buscar productos…" oninput="filterCatalog(this.value)" />
-        </div>
-        <div class="cat-filter-chips" id="catFilterChips">
-          <button class="filter-chip active" data-cat="" onclick="setCatalogCatFilter('',this)">Todos</button>
-        </div>
-      </div>
-
-      <!-- Products table -->
-      <div class="products-table-wrap">
-        <table class="products-table" id="productsTable">
-          <thead>
-            <tr>
-              <th>Foto</th>
-              <th>Producto</th>
-              <th>Categorías</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="productsTableBody">
-            <tr><td colspan="7" class="table-empty"><i class="fas fa-box-open"></i><br>Aún no tienes productos. ¡Crea el primero!</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── REFERENCIAS ── -->
-    <section id="sec-referencias" class="admin-section">
-      <div class="section-header">
-        <h1 class="section-title">Referencias</h1>
-      </div>
-      <div class="admin-card" style="text-align:center;padding:60px 24px;">
-        <i class="fas fa-star" style="font-size:3rem;color:var(--pink-300);display:block;margin-bottom:12px;"></i>
-        <h2 style="font-family:'Playfair Display',serif;margin-bottom:8px;">¡Hola mundo!</h2>
-        <p style="color:var(--gray-500);">La sección de referencias estará disponible próximamente.</p>
-      </div>
-    </section>
-
-    <!-- ── CONTACTO ── -->
-    <section id="sec-contacto" class="admin-section">
-      <div class="section-header">
-        <div>
-          <h1 class="section-title">Contacto</h1>
-          <p class="section-sub">Configura tus perfiles y canales de atención</p>
-        </div>
-        <button class="btn-primary" onclick="saveContacto()">
-          <i class="fas fa-save"></i> Guardar cambios
-        </button>
-      </div>
-
-      <div class="cards-grid">
-        <!-- WhatsApp -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp</div>
-          <div class="form-group">
-            <label>Número (con código de país)</label>
-            <input type="tel" id="cWapp" placeholder="525512345678" />
-          </div>
-          <div class="form-group">
-            <label>Mensaje automático de bienvenida</label>
-            <textarea id="cWappMsg" rows="2" placeholder="¡Hola! Me interesa conocer sus productos…"></textarea>
-          </div>
-        </div>
-        <!-- Teléfono -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fas fa-phone" style="color:var(--pink-500)"></i> Teléfono</div>
-          <div class="form-group">
-            <label>Número de teléfono</label>
-            <input type="tel" id="cPhone" placeholder="+52 55 1234 5678" />
-          </div>
-          <div class="form-group">
-            <label>Horario de atención</label>
-            <input type="text" id="cHorario" placeholder="Lun-Sáb 9am-7pm" />
-          </div>
-        </div>
-        <!-- Instagram -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fab fa-instagram" style="color:#ee2a7b"></i> Instagram</div>
-          <div class="form-group">
-            <label>Usuario (sin @)</label>
-            <input type="text" id="cIg" placeholder="mibazar_mx" />
-          </div>
-          <div class="form-group">
-            <label>URL directa</label>
-            <input type="url" id="cIgUrl" placeholder="https://instagram.com/mibazar_mx" />
-          </div>
-        </div>
-        <!-- Facebook -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fab fa-facebook-f" style="color:#1877F2"></i> Facebook</div>
-          <div class="form-group">
-            <label>Nombre de página</label>
-            <input type="text" id="cFb" placeholder="@mibazar.mx" />
-          </div>
-          <div class="form-group">
-            <label>URL directa</label>
-            <input type="url" id="cFbUrl" placeholder="https://facebook.com/mibazar.mx" />
-          </div>
-        </div>
-        <!-- TikTok -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fab fa-tiktok"></i> TikTok</div>
-          <div class="form-group">
-            <label>Usuario (sin @)</label>
-            <input type="text" id="cTiktok" placeholder="mibazar_mx" />
-          </div>
-          <div class="form-group">
-            <label>URL directa</label>
-            <input type="url" id="cTiktokUrl" placeholder="https://tiktok.com/@mibazar_mx" />
-          </div>
-        </div>
-        <!-- Dirección -->
-        <div class="admin-card">
-          <div class="card-head"><i class="fas fa-map-marker-alt" style="color:var(--pink-500)"></i> Dirección física</div>
-          <div class="form-group">
-            <label>Dirección</label>
-            <input type="text" id="cAddress" placeholder="Calle, número, colonia, ciudad" />
-          </div>
-          <div class="form-group">
-            <label>Link a Google Maps</label>
-            <input type="url" id="cMaps" placeholder="https://maps.google.com/…" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-</div>
+</section>
 
 <!-- ══════════════════════════════════════════
-     MODAL: PRODUCTO
+     BUSINESSES GRID
 ══════════════════════════════════════════ -->
-<div class="modal-overlay hidden" id="productModalOverlay" onclick="closeProductModalOnBg(event)">
-  <div class="modal-panel" id="productModal">
-    <div class="modal-panel-head">
-      <h2 id="productModalTitle">Nuevo producto</h2>
-      <button class="modal-close-btn" onclick="closeProductModal()"><i class="fas fa-times"></i></button>
+<section class="landing-results">
+  <div class="landing-results-inner">
+    <div class="results-header">
+      <h2>Bazares disponibles</h2>
+      <span class="results-count" id="businessesCount"></span>
     </div>
-    <div class="modal-panel-body">
-      <div class="modal-grid">
 
-        <!-- Col izquierda: fotos -->
-        <div class="modal-col-photos">
-          <label class="field-label">Fotos del producto</label>
-          <div class="photos-grid" id="photosGrid">
-            <div class="photo-add-btn" onclick="document.getElementById('photoFileInput').click()">
-              <i class="fas fa-plus"></i>
-              <span>Agregar foto</span>
-            </div>
-          </div>
-          <input type="file" id="photoFileInput" accept="image/*" multiple class="hidden" onchange="handlePhotoUpload(event)" />
-          <p class="field-note">Arrastra para reordenar · Clic en × para eliminar</p>
-        </div>
-
-        <!-- Col derecha: datos -->
-        <div class="modal-col-data">
-          <div class="form-group">
-            <label class="field-label">Nombre del producto *</label>
-            <input type="text" id="pName" placeholder="Ej. Vestido floral de verano" />
-          </div>
-
-          <div class="form-group">
-            <label class="field-label">Descripción</label>
-            <textarea id="pDesc" rows="3" placeholder="Describe el producto…"></textarea>
-          </div>
-
-          <div class="cards-grid inner-2">
-            <div class="form-group">
-              <label class="field-label">Precio (MXN) *</label>
-              <input type="number" id="pPrice" placeholder="0.00" min="0" step="0.01" />
-            </div>
-            <div class="form-group">
-              <label class="field-label">Stock</label>
-              <input type="number" id="pStock" placeholder="Disponible" min="0" />
-            </div>
-          </div>
-
-          <!-- Categorías -->
-          <div class="form-group">
-            <label class="field-label">Categorías</label>
-            <div class="tag-selector" id="catSelector">
-              <div class="tag-chips" id="selectedCatsChips"></div>
-              <div class="tag-input-wrap">
-                <input type="text" id="catInput" placeholder="Selecciona o crea categoría…" oninput="filterCatSuggestions(this.value)" onfocus="showCatDropdown()" />
-                <div class="tag-dropdown hidden" id="catDropdown"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Etiquetas -->
-          <div class="form-group">
-            <label class="field-label">Etiquetas <span class="field-hint">(decorativas: Nuevo, Oferta, etc.)</span></label>
-            <div class="tag-selector" id="tagSelector">
-              <div class="tag-chips" id="selectedTagsChips"></div>
-              <div class="tag-input-wrap">
-                <input type="text" id="tagInput" placeholder="Escribe y presiona Enter…" onkeydown="handleTagInput(event)" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Variantes -->
-          <div class="form-group">
-            <label class="field-label">Variantes del producto</label>
-            <div id="variantsList"></div>
-            <button class="btn-ghost mt-10" onclick="addVariantRow()">
-              <i class="fas fa-plus"></i> Agregar variante (talla, color, material…)
-            </button>
-          </div>
-
-          <!-- Estado -->
-          <div class="form-group">
-            <label class="field-label">Condición</label>
-            <div class="radio-group">
-              <label class="radio-option">
-                <input type="radio" name="pCondition" value="nuevo" checked /> Nuevo
-              </label>
-              <label class="radio-option">
-                <input type="radio" name="pCondition" value="usado" /> Usado
-              </label>
-            </div>
-          </div>
-
-          <!-- Activo -->
-          <div class="form-group">
-            <label class="toggle-row">
-              <span class="field-label" style="margin:0">Producto activo (visible en tienda)</span>
-              <div class="toggle-switch">
-                <input type="checkbox" id="pActive" checked />
-                <span class="toggle-slider"></span>
-              </div>
-            </label>
-          </div>
-
-        </div>
-      </div>
+    <!-- Loading -->
+    <div id="landingLoading" class="landing-loading">
+      <div class="spinner"></div>
+      <p>Cargando bazares…</p>
     </div>
-    <div class="modal-panel-foot">
-      <button class="btn-ghost" onclick="closeProductModal()">Cancelar</button>
-      <button class="btn-primary" id="saveProductBtn" onclick="saveProduct()">
-        <i class="fas fa-save"></i> Guardar producto
-      </button>
-    </div>
+
+    <!-- Grid -->
+    <div id="businessesGrid" class="businesses-grid hidden"></div>
   </div>
-</div>
+</section>
 
 <!-- ══════════════════════════════════════════
-     MODAL: CATEGORÍAS
+     INFO / VALUE PROPS
 ══════════════════════════════════════════ -->
-<div class="modal-overlay hidden" id="catModalOverlay" onclick="closeCatModalOnBg(event)">
-  <div class="modal-panel modal-sm" id="catModal">
-    <div class="modal-panel-head">
-      <h2>Categorías</h2>
-      <button class="modal-close-btn" onclick="closeCatModal()"><i class="fas fa-times"></i></button>
+<section class="landing-info">
+  <div class="landing-info-inner">
+    <div class="info-card">
+      <div class="info-icon"><i class="fas fa-store"></i></div>
+      <h3>Para clientes</h3>
+      <p>Explora catálogos completos, contacta directo por WhatsApp y descubre nuevos bazares cerca de ti.</p>
     </div>
-    <div class="modal-panel-body">
-      <div class="cat-add-row">
-        <input type="text" id="newCatInput" placeholder="Nueva categoría…" onkeydown="if(event.key==='Enter')addCategory()" />
-        <div class="cat-icon-pick" id="catIconPick">
-          <button class="btn-ghost icon-pick-btn" onclick="toggleIconPicker()">
-            <i id="selectedIconPreview" class="fas fa-tag"></i> <i class="fas fa-chevron-down" style="font-size:.7rem"></i>
-          </button>
-          <div class="icon-grid hidden" id="iconGrid"></div>
-        </div>
-        <button class="btn-primary" onclick="addCategory()"><i class="fas fa-plus"></i> Crear</button>
-      </div>
-      <div id="catList" class="cat-list"></div>
+    <div class="info-card">
+      <div class="info-icon"><i class="fas fa-rocket"></i></div>
+      <h3>Para comerciantes</h3>
+      <p>Crea tu propia tienda en línea, sube tus productos, personaliza tu marca y aparece en el buscador.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon"><i class="fas fa-heart"></i></div>
+      <h3>Apoya lo local</h3>
+      <p>Conecta directamente con bazares y negocios independientes, sin intermediarios.</p>
     </div>
   </div>
-</div>
+</section>
 
 <!-- ══════════════════════════════════════════
-     CONFIRM DIALOG
+     CTA COMERCIANTES
 ══════════════════════════════════════════ -->
-<div class="modal-overlay hidden" id="confirmOverlay">
-  <div class="confirm-dialog">
-    <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
-    <h3 id="confirmTitle">¿Estás seguro?</h3>
-    <p id="confirmMsg"></p>
-    <div class="confirm-btns">
-      <button class="btn-ghost" onclick="closeConfirm()">Cancelar</button>
-      <button class="btn-danger" id="confirmOkBtn">Eliminar</button>
-    </div>
+<section class="landing-cta">
+  <div class="landing-cta-inner">
+    <h2>¿Tienes un bazar o negocio?</h2>
+    <p>Crea tu cuenta gratis y empieza a vender en línea hoy mismo.</p>
+    <a href="/admin" class="btn-primary btn-lg">
+      <i class="fas fa-user-plus"></i> Crear mi bazar
+    </a>
   </div>
-</div>
+</section>
 
-<!-- Toast -->
-<div class="toast hidden" id="toast"></div>
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer class="landing-footer">
+  <p>Mi <span>Bazar</span> ✦ — Encuentra y crea tu bazar en línea</p>
+</footer>
 
-<!-- Loading overlay -->
-<div class="loading-overlay hidden" id="loadingOverlay">
-  <div class="spinner"></div>
-</div>
-
-<!-- Firebase SDKs -->
 <script type="module" src="js/firebase.js"></script>
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/db.js"></script>
-<script type="module" src="js/storage.js"></script>
-<script type="module" src="js/inicio.js"></script>
-<script type="module" src="js/catalogo.js"></script>
-<script type="module" src="js/contacto.js"></script>
-<script type="module" src="app.js" defer></script>
+<script type="module" src="js/landing.js"></script>
 </body>
 </html>

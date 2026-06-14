@@ -1,10 +1,20 @@
 // ═══════════════════════════════════════════════════════
 //  js/inicio.js  —  Sección Inicio: perfil + destacados
+//
+//  Además de guardar el perfil del comerciante, mantiene
+//  sincronizado el documento público en
+//  public_businesses/{slug} para que la landing/marketplace
+//  pueda listar y buscar este negocio.
 // ═══════════════════════════════════════════════════════
 
-import { getProfile, saveProfile, subscribeProducts } from "./db.js";
+import { getProfile, saveProfile, subscribeProducts, getCategories } from "./db.js";
 import { uploadLogo, uploadBanner }                   from "./storage.js";
 import { showToast, showLoading, hideLoading }         from "../app.js";
+import { currentUser }                                 from "./auth.js";
+import { db }                                          from "./firebase.js";
+import {
+  doc, getDoc, setDoc, deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let _logoFile   = null;
 let _bannerFile = null;
@@ -12,6 +22,7 @@ let _themeColor = "#EC4899";
 let _allProducts = [];
 let _featuredIds = new Set();
 let _unsubProducts = null;
+let _currentSlug = null; // slug ya guardado en public_businesses (si existe)
 
 /* ── Init on admin ready ─────────────────────────────── */
 window.addEventListener("adminReady", async () => {
@@ -40,6 +51,9 @@ async function loadInicioData() {
     _featuredIds = new Set(profile.featuredIds);
   }
 
+  _currentSlug = profile.slug || null;
+  updatePreviewLink(_currentSlug);
+
   // Update sidebar bazar name live
   const bazarName = profile.bazarName || "Mi Bazar";
   document.getElementById("userBazarName").textContent = bazarName;
@@ -54,12 +68,123 @@ function subscribeToProducts() {
   });
 }
 
+/* ════════════════════════════════════════════════════════
+   SLUG — helpers
+════════════════════════════════════════════════════════ */
+
+/**
+ * Convierte un nombre de bazar en un slug URL-friendly.
+ * Ej: "Bazar Lupita ✦" → "bazar-lupita"
+ */
+function slugify(text) {
+  return (text || "")
+    .toString()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita acentos
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")  // quita símbolos/emojis
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+const RESERVED_SLUGS = ["admin", "index", "bazar", "api", "static", "assets", "public"];
+
+/**
+ * Genera un slug disponible a partir del nombre del bazar.
+ * Si el slug base ya existe (de otro usuario), agrega un
+ * sufijo numérico hasta encontrar uno libre.
+ * Si el slug ya pertenece a este mismo usuario, lo reutiliza.
+ */
+async function resolveAvailableSlug(bazarName, uid) {
+  let base = slugify(bazarName);
+  if (!base) base = "mi-bazar";
+  if (RESERVED_SLUGS.includes(base)) base = `${base}-tienda`;
+
+  let candidate = base;
+  let n = 2;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const ref  = doc(db, "public_businesses", candidate);
+    const snap = await getDoc(ref);
+    if (!snap.exists() || snap.data().uid === uid) {
+      return candidate;
+    }
+    candidate = `${base}-${n}`;
+    n++;
+  }
+}
+
+/**
+ * Sincroniza (crea/actualiza) el documento público del negocio.
+ * Si el nombre del bazar cambió y eso cambia el slug, también
+ * elimina el documento antiguo para no dejar duplicados.
+ */
+async function syncPublicBusiness({ uid, bazarName, slogan, themeColor, logoUrl, categories }) {
+  const newSlug = await resolveAvailableSlug(bazarName, uid);
+
+  // Si el slug cambió respecto al guardado previamente, borra el anterior
+  if (_currentSlug && _currentSlug !== newSlug) {
+    try { await deleteDoc(doc(db, "public_businesses", _currentSlug)); }
+    catch (e) { console.warn("No se pudo eliminar slug anterior:", e); }
+  }
+
+  await setDoc(doc(db, "public_businesses", newSlug), {
+    uid,
+    slug: newSlug,
+    bazarName: bazarName || "Mi Bazar",
+    slogan: slogan || "",
+    themeColor: themeColor || "#EC4899",
+    logoUrl: logoUrl || "",
+    categories: categories || [],
+    updatedAt: Date.now()
+  }, { merge: false });
+
+  _currentSlug = newSlug;
+  return newSlug;
+}
+
+function updatePreviewLink(slug) {
+  const link = document.getElementById("previewLink");
+  if (!link) return;
+  if (slug) {
+    link.href = `/${slug}`;
+    link.classList.remove("disabled");
+  } else {
+    link.href = "#";
+  }
+}
+
+/**
+ * Actualiza solo el campo "categories" del documento público
+ * existente (sin tocar slug/nombre/logo). Se usa desde
+ * catalogo.js cuando se crean/editan/eliminan categorías,
+ * para que el buscador del marketplace quede al día sin
+ * necesidad de ir a guardar la sección Inicio.
+ *
+ * Si el negocio aún no tiene slug (nunca se guardó Inicio),
+ * no hace nada — se sincronizará la primera vez que se guarde.
+ */
+export async function syncPublicCategories(categoryNames) {
+  if (!_currentSlug || !currentUser) return;
+  try {
+    await setDoc(doc(db, "public_businesses", _currentSlug), {
+      categories: categoryNames,
+      updatedAt: Date.now()
+    }, { merge: true });
+  } catch (e) {
+    console.warn("No se pudo sincronizar categorías públicas:", e);
+  }
+}
+
 /* ── Save inicio ─────────────────────────────────────── */
 window.saveInicio = async function() {
   showLoading();
   try {
+    const bazarName = document.getElementById("iBazarName").value.trim();
+
     const data = {
-      bazarName:   document.getElementById("iBazarName").value.trim(),
+      bazarName,
       slogan:      document.getElementById("iSlogan").value.trim(),
       welcome:     document.getElementById("iWelcome").value.trim(),
       themeColor:  _themeColor,
@@ -75,11 +200,32 @@ window.saveInicio = async function() {
       _bannerFile = null;
     }
 
+    // Obtener nombres de categorías del comerciante (para el índice público)
+    let categoryNames = [];
+    try {
+      const cats = await getCategories();
+      categoryNames = cats.map(c => c.name);
+    } catch (e) { /* sin categorías aún, ok */ }
+
+    // Resolver/actualizar slug y documento público ANTES de guardar
+    // el perfil, para poder almacenar el slug definitivo.
+    const logoUrlForPublic = data.logoUrl || document.getElementById("logoPreview")?.src || "";
+    const slug = await syncPublicBusiness({
+      uid: currentUser.uid,
+      bazarName,
+      slogan: data.slogan,
+      themeColor: data.themeColor,
+      logoUrl: logoUrlForPublic.startsWith("blob:") ? "" : logoUrlForPublic,
+      categories: categoryNames
+    });
+    data.slug = slug;
+
     await saveProfile(data);
 
     // Update sidebar live
     document.getElementById("userBazarName").textContent = data.bazarName || "Mi Bazar";
     document.getElementById("userAvatar").textContent    = (data.bazarName || "M").charAt(0).toUpperCase();
+    updatePreviewLink(slug);
 
     hideLoading();
     showToast("✅ Inicio guardado correctamente", "success");

@@ -8,6 +8,7 @@ import {
 } from "./db.js";
 import { uploadProductPhoto, deleteFile } from "./storage.js";
 import { showToast, showLoading, hideLoading, showConfirm } from "../app.js";
+import { syncPublicCategories } from "./inicio.js";
 
 /* ── State ───────────────────────────────────────────── */
 let _categories   = [];
@@ -56,6 +57,11 @@ function onCatsUpdated() {
 
 function onProdsUpdated() {
   renderProductsTable();
+}
+
+/* ── Sincroniza nombres de categorías al índice público ─ */
+function syncCategoriesToPublic() {
+  syncPublicCategories(_categories.map(c => c.name)).catch(() => {});
 }
 
 /* ════════════════════════════════════════════════════════
@@ -419,6 +425,7 @@ window.createAndSelectCat = async function(name) {
     document.getElementById("catDropdown").classList.add("hidden");
     renderSelectedCats();
     showToast(`Categoría "${name}" creada.`, "success");
+    syncCategoriesToPublic();
   } catch(e) {
     showToast("Error al crear categoría.", "error");
   }
@@ -575,6 +582,7 @@ window.addCategory = async function() {
     await addCategory({ name, icon: _selectedIcon });
     document.getElementById("newCatInput").value = "";
     showToast(`Categoría "${name}" creada.`, "success");
+    syncCategoriesToPublic();
   } catch(e) {
     showToast("Error al crear categoría.", "error");
   }
@@ -606,6 +614,7 @@ window.saveEditCat = async function(id, orig) {
   try {
     await updateCategory(id, { name: newName });
     showToast("Categoría actualizada.", "success");
+    syncCategoriesToPublic();
   } catch(e) {
     showToast("Error al actualizar.", "error");
   }
@@ -625,6 +634,7 @@ window.confirmDeleteCat = function(id, name, count) {
     try {
       await deleteCategory(id);
       showToast("Categoría eliminada.", "success");
+      syncCategoriesToPublic();
     } catch(e) {
       showToast("Error al eliminar.", "error");
     }

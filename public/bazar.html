@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Bazar ✦ Tu Tienda Favorita</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="bazar.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LOADING
+══════════════════════════════════════════ -->
+<div id="bazarLoading" class="bazar-loading">
+  <div class="spinner"></div>
+  <p>Cargando bazar…</p>
+</div>
+
+<!-- ══════════════════════════════════════════
+     NOT FOUND
+══════════════════════════════════════════ -->
+<div id="bazarNotFound" class="bazar-notfound hidden">
+  <i class="fas fa-store-slash"></i>
+  <h2>Bazar no encontrado</h2>
+  <p data-notfound-msg>No pudimos encontrar este bazar.</p>
+  <a href="/"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
+</div>
+
+<!-- ══════════════════════════════════════════
+     APP (oculto hasta cargar datos)
+══════════════════════════════════════════ -->
+<div id="bazarApp" class="hidden">
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="/" class="back-to-marketplace" title="Volver al marketplace">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+    <div class="logo" id="bazarLogo">Mi <span>Bazar</span> ✦</div>
+    <div class="header-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="globalSearch" placeholder="Buscar productos…" oninput="handleSearch(this.value)" />
+    </div>
+    <nav>
+      <button class="active" data-section="inicio" onclick="goTo('inicio')">Inicio</button>
+      <button data-section="catalogo" onclick="goTo('catalogo')">Catálogo</button>
+      <button data-section="contacto" onclick="goTo('contacto')">Contacto</button>
+    </nav>
+  </div>
+</header>
+
+<!-- INICIO -->
+<section id="inicio" class="active">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">✨ Productos seleccionados</div>
+      <h1 id="heroTitle">Tu tienda <em>favorita</em> en línea</h1>
+      <p id="heroSubtitle">Encuentra productos increíbles al mejor precio.</p>
+      <div id="heroWelcome" class="hero-welcome hidden"></div>
+      <button class="hero-cta" onclick="scrollToProducts()"><i class="fas fa-shopping-bag"></i> Ver productos</button>
+    </div>
+  </div>
+
+  <!-- Banner -->
+  <div class="hero-banner" id="heroBanner"></div>
+
+  <!-- Featured -->
+  <div class="featured-section hidden" id="featuredSection">
+    <h2><i class="fas fa-star" style="color:var(--yellow-400)"></i> Destacados</h2>
+    <div class="featured-grid" id="featuredGrid"></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar" id="filterBar"></div>
+
+  <!-- Grid -->
+  <div class="products-section" id="productsSection">
+    <div class="products-header">
+      <h2>Productos</h2>
+      <span class="products-count" id="productsCount"></span>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+  </div>
+</section>
+
+<!-- CATÁLOGO -->
+<section id="catalogo">
+  <div class="catalog-inner">
+    <div class="catalog-header">
+      <h2>Catálogo Completo</h2>
+      <p>Explora todas las categorías y encuentra lo que buscas</p>
+    </div>
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="catalog-grid" id="catalogGrid"></div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <h2>¡Escríbenos!</h2>
+      <p>¿Tienes dudas sobre algún producto? ¿Quieres saber disponibilidad o más información? Contáctanos por el medio que prefieras y te respondemos rápidamente.</p>
+      <div class="social-links" id="contactLinks"></div>
+    </div>
+    <div class="contact-form">
+      <h3>Enviar mensaje</h3>
+      <div class="form-group">
+        <label>Tu nombre</label>
+        <input type="text" id="cfName" placeholder="Ej. María González" />
+      </div>
+      <div class="form-group">
+        <label>¿En qué estás interesado/a?</label>
+        <select id="cfProduct">
+          <option value="">— Selecciona un producto (opcional) —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tu mensaje</label>
+        <textarea id="cfMessage" placeholder="Escribe tu pregunta, duda o solicitud…"></textarea>
+      </div>
+      <button class="submit-btn" id="contactSubmitBtn" onclick="sendContactWA()">
+        <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+      </button>
+      <p class="contact-note" id="contactNote">El mensaje se abrirá en WhatsApp listo para enviar.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong data-bazar-name>Mi Bazar ✦</strong> — Creado con <a href="/">Mi Bazar</a> 💕
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal">
+    <div class="modal-carousel" id="modalCarousel">
+      <!-- images injected -->
+      <button class="modal-nav prev" id="modalPrev" onclick="modalCarouselNav(-1)"><i class="fas fa-chevron-left"></i></button>
+      <button class="modal-nav next" id="modalNext" onclick="modalCarouselNav(1)"><i class="fas fa-chevron-right"></i></button>
+      <div class="modal-dots" id="modalDots"></div>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- content injected -->
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</div><!-- /#bazarApp -->
+
+<script type="module" src="js/firebase.js"></script>
+<script type="module" src="js/bazar-public.js"></script>
+</body>
+</html>
