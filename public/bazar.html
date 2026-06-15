@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi Bazar ✦ Tu Tienda Favorita</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="bazar.css" />
 </head>
 <body>
@@ -54,7 +54,6 @@
 
 <!-- INICIO -->
 <section id="inicio" class="active">
-  <!-- Hero -->
   <div class="hero">
     <div class="hero-content">
       <div class="hero-badge">✨ Productos seleccionados</div>
@@ -64,20 +63,12 @@
       <button class="hero-cta" onclick="scrollToProducts()"><i class="fas fa-shopping-bag"></i> Ver productos</button>
     </div>
   </div>
-
-  <!-- Banner -->
   <div class="hero-banner" id="heroBanner"></div>
-
-  <!-- Featured -->
   <div class="featured-section hidden" id="featuredSection">
     <h2><i class="fas fa-star" style="color:var(--yellow-400)"></i> Destacados</h2>
     <div class="featured-grid" id="featuredGrid"></div>
   </div>
-
-  <!-- Filters -->
   <div class="filter-bar" id="filterBar"></div>
-
-  <!-- Grid -->
   <div class="products-section" id="productsSection">
     <div class="products-header">
       <h2>Productos</h2>
@@ -139,15 +130,12 @@
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
   <div class="modal" id="modal">
     <div class="modal-carousel" id="modalCarousel">
-      <!-- images injected -->
       <button class="modal-nav prev" id="modalPrev" onclick="modalCarouselNav(-1)"><i class="fas fa-chevron-left"></i></button>
       <button class="modal-nav next" id="modalNext" onclick="modalCarouselNav(1)"><i class="fas fa-chevron-right"></i></button>
       <div class="modal-dots" id="modalDots"></div>
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
     </div>
-    <div class="modal-body" id="modalBody">
-      <!-- content injected -->
-    </div>
+    <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
 

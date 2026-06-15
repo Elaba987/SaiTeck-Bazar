@@ -1,41 +1,42 @@
-{
-  "firestore": {
-    "database": "(default)",
-    "location": "nam5",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "auth": {
-    "providers": {}
-  },
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/admin",
-        "destination": "/admin.html"
-      },
-      {
-        "source": "/admin/**",
-        "destination": "/admin.html"
-      },
-      {
-        "source": "/bazar.html",
-        "destination": "/bazar.html"
-      },
-      {
-        "source": "/index.html",
-        "destination": "/index.html"
-      },
-      {
-        "source": "/:slug",
-        "destination": "/bazar.html"
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── PUBLIC BUSINESSES ────────────────────────────────────
+    // Cualquiera puede leer el índice público de bazares.
+    // Solo el propietario autenticado puede escribir su propio doc.
+    match /public_businesses/{slug} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.uid == resource.data.uid;
+      // Al crear (create), el uid viene en request.resource.data
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.uid;
+    }
+
+    // ─── USERS ────────────────────────────────────────────────
+    // Solo el propio usuario puede leer/escribir sus datos privados.
+    // Las subcolecciones de perfil, categorías y productos son
+    // legibles públicamente (para renderizar la vista del bazar).
+    match /users/{uid} {
+
+      // Perfil del bazar: lectura pública, escritura solo del dueño
+      match /profile/{docId} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == uid;
       }
-    ]
+
+      // Categorías: lectura pública, escritura solo del dueño
+      match /categories/{catId} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      // Productos: lectura pública, escritura solo del dueño
+      match /products/{productId} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
   }
 }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi Bazar Admin ✦</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -227,7 +227,6 @@
 
     <!-- ── CATÁLOGO ── -->
     <section id="sec-catalogo" class="admin-section">
-      <!-- Sub-tabs -->
       <div class="section-header">
         <div>
           <h1 class="section-title">Catálogo</h1>
@@ -239,7 +238,6 @@
         </div>
       </div>
 
-      <!-- Search + filter bar -->
       <div class="catalog-toolbar">
         <div class="search-box">
           <i class="fas fa-search"></i>
@@ -250,7 +248,6 @@
         </div>
       </div>
 
-      <!-- Products table -->
       <div class="products-table-wrap">
         <table class="products-table" id="productsTable">
           <thead>
@@ -296,7 +293,6 @@
       </div>
 
       <div class="cards-grid">
-        <!-- WhatsApp -->
         <div class="admin-card">
           <div class="card-head"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp</div>
           <div class="form-group">
@@ -308,7 +304,6 @@
             <textarea id="cWappMsg" rows="2" placeholder="¡Hola! Me interesa conocer sus productos…"></textarea>
           </div>
         </div>
-        <!-- Teléfono -->
         <div class="admin-card">
           <div class="card-head"><i class="fas fa-phone" style="color:var(--pink-500)"></i> Teléfono</div>
           <div class="form-group">
@@ -320,7 +315,6 @@
             <input type="text" id="cHorario" placeholder="Lun-Sáb 9am-7pm" />
           </div>
         </div>
-        <!-- Instagram -->
         <div class="admin-card">
           <div class="card-head"><i class="fab fa-instagram" style="color:#ee2a7b"></i> Instagram</div>
           <div class="form-group">
@@ -332,7 +326,6 @@
             <input type="url" id="cIgUrl" placeholder="https://instagram.com/mibazar_mx" />
           </div>
         </div>
-        <!-- Facebook -->
         <div class="admin-card">
           <div class="card-head"><i class="fab fa-facebook-f" style="color:#1877F2"></i> Facebook</div>
           <div class="form-group">
@@ -344,7 +337,6 @@
             <input type="url" id="cFbUrl" placeholder="https://facebook.com/mibazar.mx" />
           </div>
         </div>
-        <!-- TikTok -->
         <div class="admin-card">
           <div class="card-head"><i class="fab fa-tiktok"></i> TikTok</div>
           <div class="form-group">
@@ -356,7 +348,6 @@
             <input type="url" id="cTiktokUrl" placeholder="https://tiktok.com/@mibazar_mx" />
           </div>
         </div>
-        <!-- Dirección -->
         <div class="admin-card">
           <div class="card-head"><i class="fas fa-map-marker-alt" style="color:var(--pink-500)"></i> Dirección física</div>
           <div class="form-group">
@@ -385,8 +376,6 @@
     </div>
     <div class="modal-panel-body">
       <div class="modal-grid">
-
-        <!-- Col izquierda: fotos -->
         <div class="modal-col-photos">
           <label class="field-label">Fotos del producto</label>
           <div class="photos-grid" id="photosGrid">
@@ -398,19 +387,15 @@
           <input type="file" id="photoFileInput" accept="image/*" multiple class="hidden" onchange="handlePhotoUpload(event)" />
           <p class="field-note">Arrastra para reordenar · Clic en × para eliminar</p>
         </div>
-
-        <!-- Col derecha: datos -->
         <div class="modal-col-data">
           <div class="form-group">
             <label class="field-label">Nombre del producto *</label>
             <input type="text" id="pName" placeholder="Ej. Vestido floral de verano" />
           </div>
-
           <div class="form-group">
             <label class="field-label">Descripción</label>
             <textarea id="pDesc" rows="3" placeholder="Describe el producto…"></textarea>
           </div>
-
           <div class="cards-grid inner-2">
             <div class="form-group">
               <label class="field-label">Precio (MXN) *</label>
@@ -421,8 +406,6 @@
               <input type="number" id="pStock" placeholder="Disponible" min="0" />
             </div>
           </div>
-
-          <!-- Categorías -->
           <div class="form-group">
             <label class="field-label">Categorías</label>
             <div class="tag-selector" id="catSelector">
@@ -433,8 +416,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Etiquetas -->
           <div class="form-group">
             <label class="field-label">Etiquetas <span class="field-hint">(decorativas: Nuevo, Oferta, etc.)</span></label>
             <div class="tag-selector" id="tagSelector">
@@ -444,8 +425,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Variantes -->
           <div class="form-group">
             <label class="field-label">Variantes del producto</label>
             <div id="variantsList"></div>
@@ -453,8 +432,6 @@
               <i class="fas fa-plus"></i> Agregar variante (talla, color, material…)
             </button>
           </div>
-
-          <!-- Estado -->
           <div class="form-group">
             <label class="field-label">Condición</label>
             <div class="radio-group">
@@ -466,8 +443,6 @@
               </label>
             </div>
           </div>
-
-          <!-- Activo -->
           <div class="form-group">
             <label class="toggle-row">
               <span class="field-label" style="margin:0">Producto activo (visible en tienda)</span>
@@ -477,7 +452,6 @@
               </div>
             </label>
           </div>
-
         </div>
       </div>
     </div>
